@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+
+import numpy as np
+from numpy import *
+
+import os
+
+
+
+# ROS
+
+import rospy
+
+import tf_conversions as tf
+
+
+
+
+
+class Quaternion:
+
+  @staticmethod
+  def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+      return v
+    return v / norm
+
+  @staticmethod
+  def zerosQuat():
+    return Quaternion.normalize(np.array([1.0, 0.0, 0.0, 0.0], dtype=float))
+
+  @staticmethod
+  def zerosQuatSimp():
+    return Quaternion.normalize(np.array([1.0, 0.0], dtype=float))
+
+  @staticmethod
+  def setQuatSimp(v):
+    return Quaternion.normalize(v)
+
+
+  @staticmethod
+  def getSimplifiedQuatRobotAtti(robot_atti_quat):
+
+    robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
+    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang_yaw = robot_atti_ang[2]
+
+    robot_atti_hor_quat_tf = tf.transformations.quaternion_from_euler(0, 0, robot_atti_ang_yaw, axes='sxyz')
+    robot_atti_hor_quat = np.roll(robot_atti_hor_quat_tf, 1)
+    robot_atti_quat_simp = Quaternion.zerosQuatSimp()
+    robot_atti_quat_simp[0] = robot_atti_hor_quat[0]
+    robot_atti_quat_simp[1] = robot_atti_hor_quat[3]
+    robot_atti_quat_simp = Quaternion.normalize(robot_atti_quat_simp)
+
+    return robot_atti_quat_simp
+
+
+
+
+
+
+class Conversions:
+
+  @staticmethod
+  def convertVelLinFromRobotToWorld(robot_velo_lin_robot, robot_atti_quat_in, flag_quat_simp=True):
+
+    robot_atti_quat = np.zeros((4,), dtype=float)
+
+    if(flag_quat_simp):
+      robot_atti_quat[0] = robot_atti_quat_in[0]
+      robot_atti_quat[3] = robot_atti_quat_in[1]
+    else:
+      robot_atti_quat = robot_atti_quat_in
+    robot_atti_quat = Quaternion.normalize(robot_atti_quat)
+
+    robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
+    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang_yaw = robot_atti_ang[2]
+
+    robot_velo_lin_world = np.zeros((3,), dtype=float)
+
+    robot_velo_lin_world[0] = math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[0]-math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
+    robot_velo_lin_world[1] = math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[0]+math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
+    robot_velo_lin_world[2] = robot_velo_lin_robot[2]
+
+    return robot_velo_lin_world
+
+  @staticmethod
+  def convertVelAngFromRobotToWorld(robot_velo_ang_robot, robot_atti_quat_in, flag_quat_simp=True):
+
+    return robot_velo_ang_robot
+
+
+
+
+  @staticmethod
+  def convertVelLinFromWorldToRobot(robot_velo_lin_world, robot_atti_quat_in, flag_quat_simp=True):
+
+    robot_atti_quat = np.zeros((4,), dtype=float)
+
+    if(flag_quat_simp):
+      robot_atti_quat[0] = robot_atti_quat_in[0]
+      robot_atti_quat[3] = robot_atti_quat_in[1]
+    else:
+      robot_atti_quat = robot_atti_quat_in
+    robot_atti_quat = Quaternion.normalize(robot_atti_quat)
+
+    robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
+    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang_yaw = robot_atti_ang[2]
+
+    robot_velo_lin_robot = np.zeros((3,), dtype=float)
+
+    robot_velo_lin_robot[0] = math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[0]+math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[1]
+    robot_velo_lin_robot[1] = -math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[0]+math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[1]
+    robot_velo_lin_robot[2] = robot_velo_lin_world[2]
+
+    return robot_velo_lin_robot
+
+  @staticmethod
+  def convertVelAngFromWorldToRobot(robot_velo_ang_world, robot_atti_quat_in, flag_quat_simp=True):
+
+    return robot_velo_ang_world
+
+
