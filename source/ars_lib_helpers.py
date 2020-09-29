@@ -58,6 +58,73 @@ class Quaternion:
 
 
 
+class Pose:
+
+  position = np.zeros((3,), dtype=float)
+
+  attitude_quat = np.array([1.0, 0.0, 0.0, 0.0], dtype=float)
+
+  def __init__(self):
+
+    self.position = np.zeros((3,), dtype=float)
+
+    self.attitude_quat = np.array([1.0, 0.0, 0.0, 0.0], dtype=float)
+
+    return
+
+
+
+class PoseSimp:
+
+  parent_frame = ''
+  child_frame = ''
+
+  position = np.zeros((3,), dtype=float)
+
+  attitude_quat_simp = np.array([1.0, 0.0], dtype=float)
+
+  def __init__(self):
+
+    parent_frame = ''
+    child_frame = ''
+
+    self.position = np.zeros((3,), dtype=float)
+
+    self.attitude_quat_simp = np.array([1.0, 0.0], dtype=float)
+
+    return
+
+
+
+class PoseAlgebra:
+
+  @staticmethod
+  def computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
+
+    error_quat_simp = Quaternion.zerosQuatSimp()
+    error_quat_simp[0] = atti_quat_simp_1[0]*atti_quat_simp_2[0]+atti_quat_simp_1[1]*atti_quat_simp_2[1]
+    error_quat_simp[1] = atti_quat_simp_1[1]*atti_quat_simp_2[0]-atti_quat_simp_1[0]*atti_quat_simp_2[1]
+    if(error_quat_simp[0] < 0):
+      error_quat_simp = -1 * error_quat_simp
+
+    return error_quat_simp
+
+
+
+  @staticmethod
+  def computePoseSimpDifference(posi_1, atti_quat_simp_1, posi_2, atti_quat_simp_2):
+
+    # Position
+    delta_posi = posi_1 - posi_2
+
+    # Attitude
+    delta_atti_quat_simp = PoseAlgebra.computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2)
+
+
+    # End
+    return delta_posi, delta_atti_quat_simp
+
+
 
 
 class Conversions:
