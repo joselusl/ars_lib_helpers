@@ -191,3 +191,21 @@ class Conversions:
     return robot_velo_ang_world
 
 
+
+
+def isPointInCircle(point, circle_center, circle_radius):
+
+  circle_impl_equ = (point[0]-circle_center[0])**2 + (point[1]-circle_center[1])**2 - circle_radius**2
+
+  if(circle_impl_equ < 1.0):
+    return True
+  else:
+    return False
+
+
+
+def distanceSegmentCircle(point_segment_1, point_segment_2, circle_center, circle_radius):
+
+  # TODO
+
+  return 0.0
