@@ -110,6 +110,17 @@ class PoseAlgebra:
     return error_quat_simp
 
 
+  @staticmethod
+  def computeScalarDiffFromDiffQuatSimp(delta_atti_quat_simp):
+
+    if(delta_atti_quat_simp[0] < 0):
+      delta_atti_quat_simp = -1 * delta_atti_quat_simp
+
+    error_att = 2.0 * delta_atti_quat_simp[1].item()
+
+    return error_att
+
+
 
   @staticmethod
   def computePoseSimpDifference(posi_1, atti_quat_simp_1, posi_2, atti_quat_simp_2):
