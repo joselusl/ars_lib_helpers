@@ -17,6 +17,14 @@ import tf_conversions as tf
 
 
 
+def normalize(v):
+  norm = np.linalg.norm(v)
+  if norm == 0:
+    return v
+  return v / norm
+
+
+
 class Quaternion:
 
   @staticmethod
@@ -215,8 +223,90 @@ def isPointInCircle(point, circle_center, circle_radius):
 
 
 
-def distanceSegmentCircle(point_segment_1, point_segment_2, circle_center, circle_radius):
+def distanceSegmentCircle(point_2d_segment_1, point_2d_segment_2, circle_center_2d, circle_radius):
 
-  # TODO
+  # LINE
 
-  return 0.0
+  v_s1 = np.zeros((2,), dtype=float)
+  v_s1 = point_2d_segment_2 - point_2d_segment_1
+  v_s1 = normalize(v_s1)
+
+  v_s2 = np.zeros((2,), dtype=float)
+  v_s2[0] = v_s1[1]
+  v_s2[1] = -v_s1[0]
+
+  
+  mat_int_s1_s2 = np.array([v_s1, -v_s2]).T
+
+  sol_int_s1_s2 = np.matmul(np.linalg.inv(mat_int_s1_s2), (circle_center_2d - point_2d_segment_1))
+
+  point_int_l = sol_int_s1_s2[1] * v_s2 + circle_center_2d
+
+  dist_pi_c = abs(sol_int_s1_s2[1].item())
+
+
+  # SEGMENT
+
+  dist_p1_pi = np.linalg.norm(point_2d_segment_1-point_int_l)
+
+  dist_p1_p2 = np.linalg.norm(point_2d_segment_1-point_2d_segment_2)
+
+  dist_p2_pi = np.linalg.norm(point_2d_segment_2-point_2d_segment_2)
+
+  distance_circle = 0.0
+
+  if(dist_p1_pi<=dist_p1_p2 and dist_p2_pi<=dist_p1_p2):
+
+    # Case easy
+
+    if(dist_pi_c<circle_radius):
+      distance_circle = 0.0
+    elif(dist_pi_c==circle_radius):
+      distance_circle = 0.0
+    else:
+      distance_circle = dist_pi_c - circle_radius
+
+
+  else:
+
+    dist_p1_c = np.linalg.norm(point_2d_segment_1-circle_center_2d)
+
+    if(dist_p1_c<=circle_radius):
+      dist_p1_circ = 0.0
+    else:
+      dist_p1_circ = dist_p1_c-circle_radius
+
+    dist_p2_c = np.linalg.norm(point_2d_segment_2-circle_center_2d)
+
+    if(dist_p2_c<=circle_radius):
+      dist_p2_circ = 0.0
+    else:
+      dist_p2_circ = dist_p2_c-circle_radius
+
+    distance_circle = min(dist_p1_circ, dist_p2_circ)
+
+
+  return distance_circle
+
+
+
+def pointOverSegment(point, point_segment_1, point_segment_2):
+
+
+  point_over_segment = np.zeros((3,), dtype=float)
+
+
+  v_s1 = np.zeros((3,), dtype=float)
+  v_s1 = point_segment_2 - point_segment_1
+  v_s1 = normalize(v_s1)
+
+  v_1_0 = point - point_segment_1
+
+
+  dot_prod = np.dot(v_s1, v_1_0)
+
+
+  point_over_segment = dot_prod * v_s1 + point_segment_1
+
+
+  return point_over_segment
