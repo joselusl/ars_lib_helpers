@@ -19,7 +19,7 @@ import tf_conversions as tf
 
 def normalize(v):
   norm = np.linalg.norm(v)
-  if norm == 0:
+  if norm < 0.00001:
     return v
   return v / norm
 
@@ -30,7 +30,7 @@ class Quaternion:
   @staticmethod
   def normalize(v):
     norm = np.linalg.norm(v)
-    if norm == 0:
+    if norm < 0.00001:
       return v
     return v / norm
 
@@ -222,6 +222,19 @@ def isPointInCircle(point, circle_center, circle_radius):
     return False
 
 
+def distancePointCircle(point_2d, circle_center_2d, circle_radius):
+
+  distance_circle = 0.0
+
+  distance_center = np.linalg.norm(circle_center_2d-point_2d)
+
+  if(distance_center <= circle_radius):
+    distance_circle = 0.0
+  else:
+    distance_circle = distance_center - circle_radius
+
+  return distance_circle
+
 
 def distanceSegmentCircle(point_2d_segment_1, point_2d_segment_2, circle_center_2d, circle_radius):
 
@@ -230,6 +243,10 @@ def distanceSegmentCircle(point_2d_segment_1, point_2d_segment_2, circle_center_
   v_s1 = np.zeros((2,), dtype=float)
   v_s1 = point_2d_segment_2 - point_2d_segment_1
   v_s1 = normalize(v_s1)
+
+  # The two waypoints are the same!
+  if(np.linalg.norm(v_s1) < 0.00001):
+    return distancePointCircle(point_2d_segment_1, circle_center_2d, circle_radius)
 
   v_s2 = np.zeros((2,), dtype=float)
   v_s2[0] = v_s1[1]
@@ -251,7 +268,7 @@ def distanceSegmentCircle(point_2d_segment_1, point_2d_segment_2, circle_center_
 
   dist_p1_p2 = np.linalg.norm(point_2d_segment_1-point_2d_segment_2)
 
-  dist_p2_pi = np.linalg.norm(point_2d_segment_2-point_2d_segment_2)
+  dist_p2_pi = np.linalg.norm(point_2d_segment_2-point_int_l)
 
   distance_circle = 0.0
 
@@ -293,6 +310,7 @@ def distanceSegmentCircle(point_2d_segment_1, point_2d_segment_2, circle_center_
 def pointOverSegment(point, point_segment_1, point_segment_2):
 
 
+  flag_degradated = False
   point_over_segment = np.zeros((3,), dtype=float)
 
 
@@ -309,4 +327,23 @@ def pointOverSegment(point, point_segment_1, point_segment_2):
   point_over_segment = dot_prod * v_s1 + point_segment_1
 
 
-  return point_over_segment
+  dist_p1_ps = np.linalg.norm(point_over_segment - point_segment_1)
+  dist_p2_ps = np.linalg.norm(point_over_segment - point_segment_2)
+  dist_p1_p2 = np.linalg.norm(point_segment_2 - point_segment_1)
+
+
+  if(dist_p1_ps<=dist_p1_p2 and dist_p2_ps<=dist_p1_p2):
+
+    pass
+
+  else:
+
+    flag_degradated = True
+
+    if(dist_p1_ps < dist_p2_ps):
+      point_over_segment = point_segment_1
+    else:
+      point_over_segment = point_segment_2
+
+
+  return point_over_segment, flag_degradated
