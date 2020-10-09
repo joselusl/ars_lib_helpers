@@ -63,6 +63,40 @@ class Quaternion:
 
     return robot_atti_quat_simp
 
+  @staticmethod
+  def quatSimpProd(q1, q2):
+    qr = Quaternion.zerosQuatSimp()
+
+    qr[0] = q1[0]*q2[0]-q1[1]*q2[1]
+    qr[1] = q1[1]*q2[0]+q1[0]*q2[1]
+
+    return qr
+
+
+  @staticmethod
+  def computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
+
+    error_quat_simp = Quaternion.zerosQuatSimp()
+    error_quat_simp[0] = atti_quat_simp_1[0]*atti_quat_simp_2[0]+atti_quat_simp_1[1]*atti_quat_simp_2[1]
+    error_quat_simp[1] = atti_quat_simp_1[1]*atti_quat_simp_2[0]-atti_quat_simp_1[0]*atti_quat_simp_2[1]
+    if(error_quat_simp[0] < 0):
+      error_quat_simp = -1 * error_quat_simp
+
+    return error_quat_simp
+
+
+  @staticmethod
+  def quatSimpFromAngle(angle):
+    quatSimp = Quaternion.zerosQuatSimp()
+    quatSimp[0] = math.cos(0.5*angle)
+    quatSimp[1] = math.sin(0.5*angle)
+
+    if(quatSimp[0] < 0):
+      quatSimp = -1 * quatSimp
+
+    return quatSimp
+
+
 
 
 
@@ -109,13 +143,7 @@ class PoseAlgebra:
   @staticmethod
   def computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
 
-    error_quat_simp = Quaternion.zerosQuatSimp()
-    error_quat_simp[0] = atti_quat_simp_1[0]*atti_quat_simp_2[0]+atti_quat_simp_1[1]*atti_quat_simp_2[1]
-    error_quat_simp[1] = atti_quat_simp_1[1]*atti_quat_simp_2[0]-atti_quat_simp_1[0]*atti_quat_simp_2[1]
-    if(error_quat_simp[0] < 0):
-      error_quat_simp = -1 * error_quat_simp
-
-    return error_quat_simp
+    return Quaternion.computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2)
 
 
   @staticmethod
@@ -128,6 +156,16 @@ class PoseAlgebra:
 
     return error_att
 
+
+  @staticmethod
+  def computeAngleDiffFromDiffQuatSimp(delta_atti_quat_simp):
+
+    if(delta_atti_quat_simp[0] < 0):
+      delta_atti_quat_simp = -1 * delta_atti_quat_simp
+
+    error_att = 2.0 * math.atan(delta_atti_quat_simp[1]/delta_atti_quat_simp[0])
+
+    return error_att
 
 
   @staticmethod
