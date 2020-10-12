@@ -63,14 +63,48 @@ class Quaternion:
 
     return robot_atti_quat_simp
 
+
+  @staticmethod
+  def quatProd(p, q):
+    prod = Quaternion.zerosQuat()
+
+    prod[0] = p[0]*q[0] - p[1]*q[1] - p[2]*q[2] - p[3]*q[3]
+    prod[1] = p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2]
+    prod[2] = p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1]
+    prod[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]
+
+    return prod
+
+  @staticmethod
+  def quatConj(p):
+    conj = Quaternion.zerosQuat()
+
+    conj[0] = p[0]
+    conj[1] = -p[1]
+    conj[2] = -p[2]
+    conj[3] = -p[3]
+
+    return conj
+
+
   @staticmethod
   def quatSimpProd(q1, q2):
     qr = Quaternion.zerosQuatSimp()
 
     qr[0] = q1[0]*q2[0]-q1[1]*q2[1]
-    qr[1] = q1[1]*q2[0]+q1[0]*q2[1]
+    qr[1] = q1[0]*q2[1]+q1[1]*q2[0]
 
     return qr
+
+
+  @staticmethod
+  def quatSimpConj(p):
+    conj = Quaternion.zerosQuatSimp()
+
+    conj[0] = p[0]
+    conj[1] = -p[1]
+
+    return conj
 
 
   @staticmethod
