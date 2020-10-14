@@ -131,6 +131,52 @@ class Quaternion:
     return quatSimp
 
 
+  @staticmethod
+  def angleFromQuatSimp(quatSimp):
+    angle = 0.0
+
+    angle = 2.0 * math.atan(quatSimp[1]/quatSimp[0])
+
+    return angle
+
+
+  @staticmethod
+  def rotMat2dFromAngle(angle):
+    rotMat = np.zeros((2,2), dtype=float)
+
+    rotMat[0,0] = math.cos(angle)
+    rotMat[0,1] = -math.sin(angle)
+    rotMat[1,0] = math.sin(angle)
+    rotMat[1,1] = math.cos(angle)
+
+    return rotMat
+
+
+  @staticmethod
+  def rotMat3dFromAngle(angle):
+    rotMat = np.zeros((3,3), dtype=float)
+
+    rotMat[0:2, 0:2] = Quaternion.rotMat2dFromAngle(angle)
+    rotMat[2,2] = 1.0
+
+    return rotMat
+
+
+  @staticmethod
+  def rotMat2dFromQuatSimp(quatSimp):
+
+    rotMat = Quaternion.rotMat2dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
+
+    return rotMat
+
+
+  @staticmethod
+  def rotMat3dFromQuatSimp(quatSimp):
+
+    rotMat = Quaternion.rotMat3dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
+
+    return rotMat
+
 
 
 
