@@ -178,6 +178,18 @@ class Quaternion:
     return rotMat
 
 
+  @staticmethod
+  def diffRotMat3dWrtAngleFromAngle(angle):
+    diffRotMat = np.zeros((3,3), dtype=float)
+
+    diffRotMat[0,0] = -math.sin(angle)
+    diffRotMat[0,1] = -math.cos(angle)
+    diffRotMat[1,0] = math.cos(angle)
+    diffRotMat[1,1] = -math.cos(angle)
+    diffRotMat[2,2] = 0.0
+
+    return diffRotMat
+
 
 
 class Pose:
