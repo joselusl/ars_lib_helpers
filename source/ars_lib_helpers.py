@@ -29,10 +29,7 @@ class Quaternion:
 
   @staticmethod
   def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm < 0.00001:
-      return v
-    return v / norm
+    return normalize(v)
 
   @staticmethod
   def zerosQuat():
@@ -338,6 +335,29 @@ class Conversions:
   def convertVelAngFromWorldToRobot(robot_velo_ang_world, robot_atti_quat_in, flag_quat_simp=True):
 
     return robot_velo_ang_world
+
+
+
+class Circle3D:
+
+  id_lab = None
+  position = None
+  attitude_quat_simp = None
+  parent_frame = None
+  circle_radius = None
+
+
+  def __init__(self):
+
+    self.id_lab = -1
+    self.position = np.zeros((3,), dtype=float)
+    self.attitude_quat_simp = Quaternion.zerosQuatSimp()
+    self.parent_frame = ''
+    self.circle_radius = 0.0
+
+    return
+
+
 
 
 
