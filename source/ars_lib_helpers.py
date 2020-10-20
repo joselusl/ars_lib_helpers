@@ -132,6 +132,9 @@ class Quaternion:
   def angleFromQuatSimp(quatSimp):
     angle = 0.0
 
+    if(quatSimp[0] < 0):
+      quatSimp = -1 * quatSimp
+
     angle = 2.0 * math.atan(quatSimp[1]/quatSimp[0])
 
     return angle
@@ -182,7 +185,7 @@ class Quaternion:
     diffRotMat[0,0] = -math.sin(angle)
     diffRotMat[0,1] = -math.cos(angle)
     diffRotMat[1,0] = math.cos(angle)
-    diffRotMat[1,1] = -math.cos(angle)
+    diffRotMat[1,1] = -math.sin(angle)
     diffRotMat[2,2] = 0.0
 
     return diffRotMat
