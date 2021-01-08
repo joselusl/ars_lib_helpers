@@ -157,7 +157,7 @@ class Quaternion:
     if(quatSimp[0] < 0):
       quatSimp = -1 * quatSimp
 
-    error = 2.0 * quatSimp[1]
+    error = 2.0 * quatSimp[1].item()
 
     return error
 
