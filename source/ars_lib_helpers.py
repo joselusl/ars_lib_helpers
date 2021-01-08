@@ -43,6 +43,16 @@ class Quaternion:
   def setQuatSimp(v):
     return Quaternion.normalize(v)
 
+  @staticmethod
+  def checkConsistencyQuat(v):
+    tol=0.2
+    norm = np.linalg.norm(v)
+    if(abs(1.0-norm)>=tol):
+      vout = Quaternion.zerosQuat()
+    else:
+      vout = Quaternion.normalize(v)
+    return vout
+
 
   @staticmethod
   def getSimplifiedQuatRobotAtti(robot_atti_quat):
@@ -138,6 +148,19 @@ class Quaternion:
     angle = 2.0 * math.atan(quatSimp[1]/quatSimp[0])
 
     return angle
+
+
+  @staticmethod
+  def errorFromQuatSimp(quatSimp):
+    error = 0.0
+
+    if(quatSimp[0] < 0):
+      quatSimp = -1 * quatSimp
+
+    error = 2.0 * quatSimp[1]
+
+    return error
+
 
 
   @staticmethod
@@ -272,6 +295,62 @@ class PoseAlgebra:
 
     # End
     return delta_posi, delta_atti_quat_simp
+
+
+  @staticmethod
+  # pc = p1 + p2
+  def computePoseSimpComposition(posi_1, atti_quat_simp_1, posi_2, atti_quat_simp_2):
+
+    # Position
+    posi_comp = np.matmul(Quaternion.rotMat3dFromQuatSimp(atti_quat_simp_1), posi_2) + posi_1
+
+    # Attitude
+    atti_quat_simp_comp = Quaternion.quatSimpProd(atti_quat_simp_1, atti_quat_simp_2)
+
+    # End
+    return posi_comp, atti_quat_simp_comp
+
+
+  @staticmethod
+  # pc = -p1
+  def computePoseSimpInversion(posi_1, atti_quat_simp_1):
+
+    # Position
+    posi_inv = -np.matmul(np.transpose(Quaternion.rotMat3dFromQuatSimp(atti_quat_simp_1)), posi_1)
+
+    # Attitude
+    atti_quat_simp_inv = Quaternion.quatSimpConj(atti_quat_simp_1)
+
+    # End
+    return posi_inv, atti_quat_simp_inv
+
+
+  @staticmethod
+  # pc = p1 - p2
+  def computePoseSimpPostSubstraction(posi_1, atti_quat_simp_1, posi_2, atti_quat_simp_2):
+
+    #
+    posi_2_inv, atti_quat_simp_2_inv = PoseAlgebra.computePoseSimpInversion(posi_2, atti_quat_simp_2)
+
+    #
+    posi_subs, atti_quat_simp_subs = PoseAlgebra.computePoseSimpComposition(posi_1, atti_quat_simp_1, posi_2_inv, atti_quat_simp_2_inv)
+
+    # End
+    return posi_subs, atti_quat_simp_subs
+
+
+  @staticmethod
+  # pc = - p1 + p2
+  def computePoseSimpPreSubstraction(posi_1, atti_quat_simp_1, posi_2, atti_quat_simp_2):
+
+    #
+    posi_1_inv, atti_quat_simp_1_inv = PoseAlgebra.computePoseSimpInversion(posi_1, atti_quat_simp_1)
+
+    #
+    posi_subs, atti_quat_simp_subs = PoseAlgebra.computePoseSimpComposition(posi_1_inv, atti_quat_simp_1_inv, posi_2, atti_quat_simp_2)
+
+    # End
+    return posi_subs, atti_quat_simp_subs
 
 
 
