@@ -162,6 +162,11 @@ class Quaternion:
     return error
 
 
+  @staticmethod
+  def errorDiffFromQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
+
+    return Quaternion.errorFromQuatSimp(Quaternion.computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2))
+
 
   @staticmethod
   def rotMat2dFromAngle(angle):
