@@ -151,6 +151,12 @@ class Quaternion:
 
 
   @staticmethod
+  def angleDiffFromQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
+
+    return Quaternion.angleFromQuatSimp(Quaternion.computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2))
+
+
+  @staticmethod
   def errorFromQuatSimp(quatSimp):
     error = 0.0
 
