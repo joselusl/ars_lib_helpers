@@ -228,6 +228,9 @@ class Quaternion:
 
 class Pose:
 
+  parent_frame = ''
+  child_frame = ''
+
   position = np.zeros((3,), dtype=float)
 
   attitude_quat = np.array([1.0, 0.0, 0.0, 0.0], dtype=float)
