@@ -1,19 +1,8 @@
-#!/usr/bin/env python
-
 import numpy as np
 from numpy import *
 
-import os
-
-
-
 # ROS
-
-import rospy
-
-import tf_conversions as tf
-
-
+import tf_transformations
 
 
 
@@ -58,10 +47,10 @@ class Quaternion:
   def getSimplifiedQuatRobotAtti(robot_atti_quat):
 
     robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
-    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang = tf_transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
     robot_atti_ang_yaw = robot_atti_ang[2]
 
-    robot_atti_hor_quat_tf = tf.transformations.quaternion_from_euler(0, 0, robot_atti_ang_yaw, axes='sxyz')
+    robot_atti_hor_quat_tf = tf_transformations.quaternion_from_euler(0, 0, robot_atti_ang_yaw, axes='sxyz')
     robot_atti_hor_quat = np.roll(robot_atti_hor_quat_tf, 1)
     robot_atti_quat_simp = Quaternion.zerosQuatSimp()
     robot_atti_quat_simp[0] = robot_atti_hor_quat[0]
@@ -384,7 +373,7 @@ class Conversions:
     robot_atti_quat = Quaternion.normalize(robot_atti_quat)
 
     robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
-    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang = tf_transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
     robot_atti_ang_yaw = robot_atti_ang[2]
 
     robot_velo_lin_world = np.zeros((3,), dtype=float)
@@ -416,7 +405,7 @@ class Conversions:
     robot_atti_quat = Quaternion.normalize(robot_atti_quat)
 
     robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
-    robot_atti_ang = tf.transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+    robot_atti_ang = tf_transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
     robot_atti_ang_yaw = robot_atti_ang[2]
 
     robot_velo_lin_robot = np.zeros((3,), dtype=float)
