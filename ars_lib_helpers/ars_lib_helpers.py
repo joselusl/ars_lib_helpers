@@ -118,8 +118,8 @@ class Quaternion:
   @staticmethod
   def quatSimpFromAngle(angle):
     quatSimp = Quaternion.zerosQuatSimp()
-    quatSimp[0] = math.cos(0.5*angle)
-    quatSimp[1] = math.sin(0.5*angle)
+    quatSimp[0] = np.math.cos(0.5*angle)
+    quatSimp[1] = np.math.sin(0.5*angle)
 
     if(quatSimp[0] < 0):
       quatSimp = -1 * quatSimp
@@ -134,7 +134,7 @@ class Quaternion:
     if(quatSimp[0] < 0):
       quatSimp = -1 * quatSimp
 
-    angle = 2.0 * math.atan(quatSimp[1]/quatSimp[0])
+    angle = 2.0 * np.math.atan(quatSimp[1]/quatSimp[0])
 
     return angle
 
@@ -167,10 +167,10 @@ class Quaternion:
   def rotMat2dFromAngle(angle):
     rotMat = np.zeros((2,2), dtype=float)
 
-    rotMat[0,0] = math.cos(angle)
-    rotMat[0,1] = -math.sin(angle)
-    rotMat[1,0] = math.sin(angle)
-    rotMat[1,1] = math.cos(angle)
+    rotMat[0,0] = np.math.cos(angle)
+    rotMat[0,1] = -np.math.sin(angle)
+    rotMat[1,0] = np.math.sin(angle)
+    rotMat[1,1] = np.math.cos(angle)
 
     return rotMat
 
@@ -205,10 +205,10 @@ class Quaternion:
   def diffRotMat3dWrtAngleFromAngle(angle):
     diffRotMat = np.zeros((3,3), dtype=float)
 
-    diffRotMat[0,0] = -math.sin(angle)
-    diffRotMat[0,1] = -math.cos(angle)
-    diffRotMat[1,0] = math.cos(angle)
-    diffRotMat[1,1] = -math.sin(angle)
+    diffRotMat[0,0] = -np.math.sin(angle)
+    diffRotMat[0,1] = -np.math.cos(angle)
+    diffRotMat[1,0] = np.math.cos(angle)
+    diffRotMat[1,1] = -np.math.sin(angle)
     diffRotMat[2,2] = 0.0
 
     return diffRotMat
@@ -281,7 +281,7 @@ class PoseAlgebra:
     if(delta_atti_quat_simp[0] < 0):
       delta_atti_quat_simp = -1 * delta_atti_quat_simp
 
-    error_att = 2.0 * math.atan(delta_atti_quat_simp[1]/delta_atti_quat_simp[0])
+    error_att = 2.0 * np.math.atan(delta_atti_quat_simp[1]/delta_atti_quat_simp[0])
 
     return error_att
 
@@ -378,8 +378,8 @@ class Conversions:
 
     robot_velo_lin_world = np.zeros((3,), dtype=float)
 
-    robot_velo_lin_world[0] = math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[0]-math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
-    robot_velo_lin_world[1] = math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[0]+math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
+    robot_velo_lin_world[0] = np.math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[0]-np.math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
+    robot_velo_lin_world[1] = np.math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[0]+np.math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
     robot_velo_lin_world[2] = robot_velo_lin_robot[2]
 
     return robot_velo_lin_world
@@ -410,8 +410,8 @@ class Conversions:
 
     robot_velo_lin_robot = np.zeros((3,), dtype=float)
 
-    robot_velo_lin_robot[0] = math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[0]+math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[1]
-    robot_velo_lin_robot[1] = -math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[0]+math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[1]
+    robot_velo_lin_robot[0] = np.math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[0]+np.math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[1]
+    robot_velo_lin_robot[1] = -np.math.sin(robot_atti_ang_yaw)*robot_velo_lin_world[0]+np.math.cos(robot_atti_ang_yaw)*robot_velo_lin_world[1]
     robot_velo_lin_robot[2] = robot_velo_lin_world[2]
 
     return robot_velo_lin_robot

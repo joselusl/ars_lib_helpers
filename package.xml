@@ -7,8 +7,11 @@
   <maintainer email="joseluis.sanlop@gmail.com">Jose Luis SANCHEZ-LOPEZ</maintainer>
 
   <license>BSD</license>
+
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-nvector</exec_depend>
   
-  <depend>tf_transformations</depend>
+  <exec_depend>tf_transformations</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
