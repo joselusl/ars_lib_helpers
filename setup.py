@@ -17,7 +17,6 @@ setup(
  maintainer_email='joseluis.sanlop@gmail.com',
  description='TODO: Package description',
  license='BSD',
- tests_require=['pytest'],
  entry_points={'console_scripts': [
         ],},
 )
