@@ -24,11 +24,11 @@ class Quaternion:
 
   @staticmethod
   def zerosQuat():
-    return Quaternion.normalize(np.array([1.0, 0.0, 0.0, 0.0], dtype=float))
+    return np.array([1.0, 0.0, 0.0, 0.0], dtype=float)
 
   @staticmethod
   def zerosQuatSimp():
-    return Quaternion.normalize(np.array([1.0, 0.0], dtype=float))
+    return np.array([1.0, 0.0], dtype=float)
 
   @staticmethod
   def setQuatSimp(v):
@@ -64,53 +64,35 @@ class Quaternion:
 
   @staticmethod
   def quatProd(p, q):
-    prod = Quaternion.zerosQuat()
-
-    prod[0] = p[0]*q[0] - p[1]*q[1] - p[2]*q[2] - p[3]*q[3]
-    prod[1] = p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2]
-    prod[2] = p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1]
-    prod[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]
-
-    return prod
+    return np.array([
+      p[0]*q[0] - p[1]*q[1] - p[2]*q[2] - p[3]*q[3],
+      p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2],
+      p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1],
+      p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0],
+    ], dtype=float)
 
   @staticmethod
   def quatConj(p):
-    conj = Quaternion.zerosQuat()
-
-    conj[0] = p[0]
-    conj[1] = -p[1]
-    conj[2] = -p[2]
-    conj[3] = -p[3]
-
-    return conj
+    return np.array([p[0], -p[1], -p[2], -p[3]], dtype=float)
 
 
   @staticmethod
   def quatSimpProd(q1, q2):
-    qr = Quaternion.zerosQuatSimp()
-
-    qr[0] = q1[0]*q2[0]-q1[1]*q2[1]
-    qr[1] = q1[0]*q2[1]+q1[1]*q2[0]
-
-    return qr
+    return np.array([q1[0]*q2[0]-q1[1]*q2[1], q1[0]*q2[1]+q1[1]*q2[0]], dtype=float)
 
 
   @staticmethod
   def quatSimpConj(p):
-    conj = Quaternion.zerosQuatSimp()
-
-    conj[0] = p[0]
-    conj[1] = -p[1]
-
-    return conj
+    return np.array([p[0], -p[1]], dtype=float)
 
 
   @staticmethod
   def computeDiffQuatSimp(atti_quat_simp_1, atti_quat_simp_2):
 
-    error_quat_simp = Quaternion.zerosQuatSimp()
-    error_quat_simp[0] = atti_quat_simp_1[0]*atti_quat_simp_2[0]+atti_quat_simp_1[1]*atti_quat_simp_2[1]
-    error_quat_simp[1] = atti_quat_simp_1[1]*atti_quat_simp_2[0]-atti_quat_simp_1[0]*atti_quat_simp_2[1]
+    error_quat_simp = np.array([
+      atti_quat_simp_1[0]*atti_quat_simp_2[0]+atti_quat_simp_1[1]*atti_quat_simp_2[1],
+      atti_quat_simp_1[1]*atti_quat_simp_2[0]-atti_quat_simp_1[0]*atti_quat_simp_2[1],
+    ], dtype=float)
     if(error_quat_simp[0] < 0):
       error_quat_simp = -1 * error_quat_simp
 
@@ -119,9 +101,7 @@ class Quaternion:
 
   @staticmethod
   def quatSimpFromAngle(angle):
-    quatSimp = Quaternion.zerosQuatSimp()
-    quatSimp[0] = math.cos(0.5*angle)
-    quatSimp[1] = math.sin(0.5*angle)
+    quatSimp = np.array([math.cos(0.5*angle), math.sin(0.5*angle)], dtype=float)
 
     if(quatSimp[0] < 0):
       quatSimp = -1 * quatSimp
@@ -167,40 +147,40 @@ class Quaternion:
 
   @staticmethod
   def rotMat2dFromAngle(angle):
-    rotMat = np.zeros((2,2), dtype=float)
+    rotMat2d = np.zeros((2,2), dtype=float)
 
-    rotMat[0,0] = math.cos(angle)
-    rotMat[0,1] = -math.sin(angle)
-    rotMat[1,0] = math.sin(angle)
-    rotMat[1,1] = math.cos(angle)
+    rotMat2d[0,0] = math.cos(angle)
+    rotMat2d[0,1] = -math.sin(angle)
+    rotMat2d[1,0] = math.sin(angle)
+    rotMat2d[1,1] = math.cos(angle)
 
-    return rotMat
+    return rotMat2d
 
 
   @staticmethod
   def rotMat3dFromAngle(angle):
-    rotMat = np.zeros((3,3), dtype=float)
+    rotMat3d = np.zeros((3,3), dtype=float)
 
-    rotMat[0:2, 0:2] = Quaternion.rotMat2dFromAngle(angle)
-    rotMat[2,2] = 1.0
+    rotMat3d[0:2, 0:2] = Quaternion.rotMat2dFromAngle(angle)
+    rotMat3d[2,2] = 1.0
 
-    return rotMat
+    return rotMat3d
 
 
   @staticmethod
   def rotMat2dFromQuatSimp(quatSimp):
 
-    rotMat = Quaternion.rotMat2dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
+    rotMat2d = Quaternion.rotMat2dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
 
-    return rotMat
+    return rotMat2d
 
 
   @staticmethod
   def rotMat3dFromQuatSimp(quatSimp):
 
-    rotMat = Quaternion.rotMat3dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
+    rotMat3d = Quaternion.rotMat3dFromAngle(Quaternion.angleFromQuatSimp(quatSimp))
 
-    return rotMat
+    return rotMat3d
 
 
   @staticmethod
