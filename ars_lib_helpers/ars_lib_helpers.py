@@ -46,6 +46,27 @@ class Quaternion:
 
 
   @staticmethod
+  def quatFromRollPitchYaw(roll, pitch, yaw):
+    # Closed-form roll-pitch-yaw (extrinsic 'sxyz') -> quaternion [w,x,y,z].
+    # Equivalent to tf_transformations.quaternion_from_euler(roll, pitch, yaw, axes='sxyz')
+    # (verified to match it to float64 machine precision), without building/multiplying
+    # rotation matrices for what is just a fixed formula.
+    cr = math.cos(0.5*roll)
+    sr = math.sin(0.5*roll)
+    cp = math.cos(0.5*pitch)
+    sp = math.sin(0.5*pitch)
+    cy = math.cos(0.5*yaw)
+    sy = math.sin(0.5*yaw)
+
+    return np.array([
+      cr*cp*cy + sr*sp*sy,
+      sr*cp*cy - cr*sp*sy,
+      cr*sp*cy + sr*cp*sy,
+      cr*cp*sy - sr*sp*cy,
+    ], dtype=float)
+
+
+  @staticmethod
   def getSimplifiedQuatRobotAtti(robot_atti_quat):
 
     robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
@@ -345,26 +366,24 @@ class Conversions:
   @staticmethod
   def convertVelLinFromRobotToWorld(robot_velo_lin_robot, robot_atti_quat_in, flag_quat_simp=True):
 
-    robot_atti_quat = np.zeros((4,), dtype=float)
-
     if(flag_quat_simp):
-      robot_atti_quat[0] = robot_atti_quat_in[0]
-      robot_atti_quat[3] = robot_atti_quat_in[1]
+      # cos(yaw)/sin(yaw) from the half-angle quaternion via double-angle identities;
+      # avoids a tf_transformations matrix round-trip for what is just a 2D yaw rotation
+      cos_yaw = robot_atti_quat_in[0]*robot_atti_quat_in[0] - robot_atti_quat_in[1]*robot_atti_quat_in[1]
+      sin_yaw = 2.0*robot_atti_quat_in[0]*robot_atti_quat_in[1]
     else:
-      robot_atti_quat = robot_atti_quat_in
-    robot_atti_quat = Quaternion.normalize(robot_atti_quat)
+      robot_atti_quat = Quaternion.normalize(robot_atti_quat_in)
+      robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
+      robot_atti_ang = tf_transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
+      robot_atti_ang_yaw = robot_atti_ang[2]
+      cos_yaw = math.cos(robot_atti_ang_yaw)
+      sin_yaw = math.sin(robot_atti_ang_yaw)
 
-    robot_atti_quat_tf = np.roll(robot_atti_quat, -1)
-    robot_atti_ang = tf_transformations.euler_from_quaternion(robot_atti_quat_tf, axes='sxyz')
-    robot_atti_ang_yaw = robot_atti_ang[2]
-
-    robot_velo_lin_world = np.zeros((3,), dtype=float)
-
-    robot_velo_lin_world[0] = math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[0]-math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
-    robot_velo_lin_world[1] = math.sin(robot_atti_ang_yaw)*robot_velo_lin_robot[0]+math.cos(robot_atti_ang_yaw)*robot_velo_lin_robot[1]
-    robot_velo_lin_world[2] = robot_velo_lin_robot[2]
-
-    return robot_velo_lin_world
+    return np.array([
+      cos_yaw*robot_velo_lin_robot[0] - sin_yaw*robot_velo_lin_robot[1],
+      sin_yaw*robot_velo_lin_robot[0] + cos_yaw*robot_velo_lin_robot[1],
+      robot_velo_lin_robot[2],
+    ], dtype=float)
 
   @staticmethod
   def convertVelAngFromRobotToWorld(robot_velo_ang_robot, robot_atti_quat_in, flag_quat_simp=True):
